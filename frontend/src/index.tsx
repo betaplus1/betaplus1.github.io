@@ -23,10 +23,16 @@ import {
   MessageInitialState,
   MessageReducer,
 } from "./Components/Message/MessageReducer";
+import {
+  DarkModeInitialState,
+  DarkModeReducer,
+} from "./Features/DarkMode/DarkModeReducer";
+import { StaticLoader, StaticLoaderReducer } from './Features';
 import { Main } from "./Pages";
 import { Topbar } from "./Components/Topbar";
-import { ThemeProvider } from "@material-ui/core";
+import { CssBaseline, ThemeProvider } from "@material-ui/core";
 import { theme } from "./themes";
+import { DarkModeProvider } from "./Features/DarkMode";
 
 //#region redux configuration
 export const GlobalInitialState = {
@@ -35,6 +41,8 @@ export const GlobalInitialState = {
 
 const GlobalReducer = combineReducers({
   Message: MessageReducer.reducer,
+  DarkMode: DarkModeReducer.reducer,
+  StaticLoader: StaticLoaderReducer.reducer,
 });
 
 const customizedMiddleware = getDefaultMiddleware({ serializableCheck: false });
@@ -57,7 +65,7 @@ export type GlobalDispatch = typeof store.dispatch;
 export const useGlobalDispatch = () => useDispatch<GlobalDispatch>();
 export type GlobalState = ReturnType<typeof GlobalReducer>;
 export const useGlobalState: TypedUseSelectorHook<GlobalState> = (selector) =>
-  useSelector(selector, shallowEqual);
+  useSelector(selector);
 export type ThunkResult<R> = ThunkAction<R, GlobalState, undefined, AnyAction>;
 
 //#endregion
@@ -65,19 +73,18 @@ export type ThunkResult<R> = ThunkAction<R, GlobalState, undefined, AnyAction>;
 const history = createBrowserHistory();
 
 ReactDOM.render(
-  <React.StrictMode>
+  <>
     <Provider store={store}>
-      <ThemeProvider theme={theme}>
-        <Message />
-        <Topbar />
+      <DarkModeProvider>
+        <CssBaseline />
         <Router history={history}>
           <Switch>
             <Route path="/" component={Main} />
           </Switch>
         </Router>
-      </ThemeProvider>
+      </DarkModeProvider>
     </Provider>
-  </React.StrictMode>,
+  </>,
   document.getElementById("root")
 );
 
